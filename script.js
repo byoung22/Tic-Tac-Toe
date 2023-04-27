@@ -12,7 +12,7 @@ const gameLogic = {
             uiRendering.renderBoard();
             return
         } else if (this.round % 2 === 1 && this.round < 9) {
-            this.botBrain('easy');
+            this.botBrain(uiRendering.difficultyValue);
             if (this.checkWins(bot)) {
                 console.log('Bot Wins!')
                 uiRendering.renderBoard();
@@ -66,19 +66,39 @@ const gameLogic = {
             let row = Math.floor(Math.random() * 3);
             let col = Math.floor(Math.random() * 3);
             uiRendering.placeMarker(row, col, bot.choice) ? console.log('Bot moved!'): this.botBrain('easy');
+        } else {
+            
         };
+    },
+    resetGame: function() {
+        this.gameboard = [['','',''],['','',''],['','','']];
+        this.round = 0;
     },
 }
 
 const uiRendering = {
     init: function() {
         this.cacheDom();
+        this.bindOptions();
         this.renderBoard();
-        this.bindEvents();
     },
     cacheDom: function() {
         this.container = document.getElementById('container');
         this.cell = document.querySelectorAll('.cell');
+        this.difficulty = document.getElementById("mySelect");
+        this.difficultyValue = this.difficulty.value;
+        this.startButton = document.getElementById('start'); 
+    },
+    bindOptions: function() {
+        this.startButton.addEventListener('click', () => {
+            gameLogic.resetGame();
+            this.init();
+            this.bindEvents();
+        });
+        //Change value when difficulty changes
+        this.difficulty.onchange = function() {
+            uiRendering.difficultyValue = uiRendering.difficulty.value;
+        };
     },
     renderBoard: function() {
         this.container.innerHTML = '';
@@ -97,7 +117,6 @@ const uiRendering = {
             }
         }
         this.cacheDom(); // Recache DOM for newly rendered items
-
     },
     placeMarker: function(row, col, marker) {
         if (gameLogic.gameboard[row][col] === '') {
