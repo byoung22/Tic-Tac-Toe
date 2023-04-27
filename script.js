@@ -1,5 +1,6 @@
 /*(function() {*/
     const Gameboard = {
+        round: 0,
         gameboard: [['','',''],['','',''],['','','']],
         init: function() {
             this.cacheDom();
@@ -33,9 +34,11 @@
                 const i = cell.dataset.row;
                 const j = cell.dataset.col;
                 cell.addEventListener('click', () => {
-                    this.gameboard[i][j] = 'x'; // Need to add turn base system
-                    this.renderBoard();
+                    this.placeMarker(i, j, player.choice)
                 });
+            });
+            this.container.addEventListener('click', () => {
+                this.mainGame();
             });
         },
         renderXO: function(choice, parent) {
@@ -58,9 +61,65 @@
         playerFactory: (choice, priority) => {
             return {choice, priority};
         },
+        mainGame: function() {
+            if (this.checkWins(player)) {
+                console.log('Player Wins!');
+                return
+            } else if (this.checkWins(bot)) {
+                console.log('Bot Wins!');
+                return
+            } else {
+                if (this.round % 2 === 1 && this.round < 9) {
+                    this.botBrain('easy');
+                }
+            };
+        },
+        placeMarker: function(row, col, marker) {
+            if (this.gameboard[row][col] === '') {
+                this.gameboard[row][col] = marker;
+                this.renderBoard();
+                this.round++;
+                return true;
+            } else {
+                console.log('The spot is already taken!');
+            } return false
+        },
+        checkWins: function(player) {
+            // Check Rows
+            for (let i = 0; i < 3; i++) {
+                if (this.gameboard[i][0] === player.choice && this.gameboard[i][1] === player.choice && this.gameboard[i][2] === player.choice) {
+                    return true;
+                }
+            }   
+            // Check columns
+            for (let j = 0; j < 3; j++) {
+                if (this.gameboard[0][j] === player.choice && this.gameboard[1][j] === player.choice && this.gameboard[2][j] === player.choice) {
+                    return true;
+                }
+            }    
+            // Check diagonals
+            if (this.gameboard[0][0] === player.choice && this.gameboard[1][1] === player.choice && this.gameboard[2][2] === player.choice) {
+                return true;
+            }
+            if (this.gameboard[0][2] === player.choice && this.gameboard[1][1] === player.choice && this.gameboard[2][0] === player.choice) {
+                return true;
+            }        
+        // If no winning condition is met, return false
+        return false;
+        },
+        botBrain: function(difficulty) {
+            let row;
+            let col;
+            if (difficulty === 'easy') {
+                let row = Math.floor(Math.random() * 3);
+                let col = Math.floor(Math.random() * 3);
+                this.placeMarker(row, col, bot.choice) ? console.log('Bot moved!'): this.botBrain('easy');
+            };
+        },
     };
     Gameboard.init();
     const player = Gameboard.playerFactory('x', 1);
     const bot = Gameboard.playerFactory('o', 2);
+    
 
 /*})();*/
