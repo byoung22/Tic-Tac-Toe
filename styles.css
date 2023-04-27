@@ -2,8 +2,7 @@
     box-sizing: border-box;
     color: #ff7171;
 }
-#container {
-}
+
 .row {
     display: flex;
     

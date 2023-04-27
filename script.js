@@ -5,15 +5,21 @@ const gameLogic = {
     mainGame: function() {
         if (this.checkWins(player)) {
             console.log('Player Wins!');
+            uiRendering.renderBoard();
             return
         } else if (this.checkWins(bot)) {
             console.log('Bot Wins!');
+            uiRendering.renderBoard();
             return
         } else if (this.round % 2 === 1 && this.round < 9) {
             this.botBrain('easy');
-            this.checkWins(bot) ? console.log('Bot Wins!') : false;
+            if (this.checkWins(bot)) {
+                console.log('Bot Wins!')
+                uiRendering.renderBoard();
+            };
         } else if (this.round === 9) {
             console.log('DRAW!');
+            uiRendering.renderBoard();
         };
     },
     checkWins: function(player) {
@@ -63,10 +69,12 @@ const gameLogic = {
         };
     },
 }
+
 const uiRendering = {
     init: function() {
         this.cacheDom();
         this.renderBoard();
+        this.bindEvents();
     },
     cacheDom: function() {
         this.container = document.getElementById('container');
@@ -89,12 +97,13 @@ const uiRendering = {
             }
         }
         this.cacheDom(); // Recache DOM for newly rendered items
-        this.bindEvents();
+
     },
     placeMarker: function(row, col, marker) {
         if (gameLogic.gameboard[row][col] === '') {
             gameLogic.gameboard[row][col] = marker;
-            uiRendering.renderBoard();
+            this.renderBoard();
+            this.bindEvents();
             gameLogic.round++;
             return true;
         } else {
@@ -132,9 +141,8 @@ const uiRendering = {
 const playerFactory = (choice, priority) => {
     return {choice, priority};
 };
-    uiRendering.init();
-    const player = playerFactory('x', 1);
-    const bot = playerFactory('o', 2);
-    
+uiRendering.init();
+const player = playerFactory('x', 1);
+const bot = playerFactory('o', 2);
 
 /*})();*/
