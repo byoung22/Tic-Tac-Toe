@@ -34,11 +34,9 @@
                 const i = cell.dataset.row;
                 const j = cell.dataset.col;
                 cell.addEventListener('click', () => {
-                    this.placeMarker(i, j, player.choice)
+                    this.placeMarker(i, j, player.choice);
+                    this.mainGame();
                 });
-            });
-            this.container.addEventListener('click', () => {
-                this.mainGame();
             });
         },
         renderXO: function(choice, parent) {
@@ -68,10 +66,10 @@
             } else if (this.checkWins(bot)) {
                 console.log('Bot Wins!');
                 return
-            } else {
-                if (this.round % 2 === 1 && this.round < 9) {
-                    this.botBrain('easy');
-                }
+            } else if (this.round % 2 === 1 && this.round < 9) {
+                this.botBrain('easy');
+            } else if (this.round === 9) {
+                console.log('DRAW!');
             };
         },
         placeMarker: function(row, col, marker) {
