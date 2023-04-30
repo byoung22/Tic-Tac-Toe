@@ -83,10 +83,8 @@ const gameLogic = {
             let bestMove;
 
             for (const move of availableMoves) {
-                const boardCopy = JSON.parse(JSON.stringify(newBoard));
-                boardCopy[move.row][move.col] = bot.choice;
-
-                const {score} = this.minimax(boardCopy, depth + 1, player); // recursive
+                newBoard[move.row][move.col] = bot.choice;
+                const {score} = this.minimax(newBoard, depth + 1, player); // recursive
                 newBoard[move.row][move.col] = '';
 
                 if (score > bestScore) {
@@ -103,9 +101,8 @@ const gameLogic = {
             let bestMove;
 
             for (const move of availableMoves) {
-                const boardCopy = JSON.parse(JSON.stringify(newBoard));
-                boardCopy[move.row][move.col] = player.choice;
-                const {score} = this.minimax(boardCopy, depth + 1, bot); // recursive
+                newBoard[move.row][move.col] = player.choice;
+                const {score} = this.minimax(newBoard, depth + 1, bot); // recursive
                 newBoard[move.row][move.col] = '';
 
                 if (score < bestScore) {
