@@ -29,13 +29,15 @@ function checkWin(board, player) {
     const availableMoves = board
       .map((cell, index) => (cell === '' ? index : -1))
       .filter((index) => index !== -1);
-    if (maximizingPlayer) {
+      if (maximizingPlayer) {
       let bestScore = -Infinity; // initializing score
       let bestMove;
   
       for (const move of availableMoves) {
+        console.log(board)
         board[move] = 'X';
         const { score } = minimax(board, depth + 1, false);
+        console.log(score)
         board[move] = '';
   
         if (score > bestScore) {

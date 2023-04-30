@@ -71,8 +71,8 @@ const gameLogic = {
         return emptyCells;
     },
     minimax: function(newBoard, depth, currentPlayer) {
-        if (this.checkWins(newBoard, bot.choice)) return {score: 10 - depth};
-        if (this.checkWins(newBoard, player.choice)) return {score: -10 + depth};
+        if (this.checkWins(newBoard, bot)) return {score: 10 - depth};
+        if (this.checkWins(newBoard, player)) return {score: -10 + depth};
         if (this.emptyCells(newBoard).length === 0) return {score: 0};
 
         // available moves this iteration can make
@@ -81,9 +81,12 @@ const gameLogic = {
         if (currentPlayer === bot) {
             let bestScore = -Infinity; // initializing score
             let bestMove;
+
             for (const move of availableMoves) {
-                newBoard[move.row][move.col] = bot.choice;
-                const {score} = this.minimax(newBoard, depth + 1, player); // recursive
+                const boardCopy = JSON.parse(JSON.stringify(newBoard));
+                boardCopy[move.row][move.col] = bot.choice;
+
+                const {score} = this.minimax(boardCopy, depth + 1, player); // recursive
                 newBoard[move.row][move.col] = '';
 
                 if (score > bestScore) {
@@ -91,15 +94,18 @@ const gameLogic = {
                     bestMove = move;
                 }
             }
+
             return {move: bestMove, score: bestScore};
         }
         // scoring best player move
         if (currentPlayer === player) {
             let bestScore = Infinity; // initializing score
             let bestMove;
+
             for (const move of availableMoves) {
-                newBoard[move.row][move.col] = player.choice;
-                const {score} = this.minimax(newBoard, depth + 1, bot); // recursive
+                const boardCopy = JSON.parse(JSON.stringify(newBoard));
+                boardCopy[move.row][move.col] = player.choice;
+                const {score} = this.minimax(boardCopy, depth + 1, bot); // recursive
                 newBoard[move.row][move.col] = '';
 
                 if (score < bestScore) {
@@ -107,6 +113,7 @@ const gameLogic = {
                     bestMove = move;
                 }
             }
+
             return {move: bestMove, score: bestScore};
         }
     },
