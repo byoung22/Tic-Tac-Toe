@@ -3,32 +3,32 @@ const gameLogic = {
     round: 0,
     gameboard: [['','',''],['','',''],['','','']],
     mainGame: function() {
-        if (this.checkWins(player)) {
+        if (this.checkWins(this.gameboard, player)) {
             console.log('Player Wins!');
-            uiRendering.renderBoard();
+            uiRendering.renderBoard(); // Render without binding event listener
             return
-        } else if (this.checkWins(bot)) {
+        } else if (this.checkWins(this.gameboard, bot)) {
             console.log('Bot Wins!');
-            uiRendering.renderBoard();
+            uiRendering.renderBoard(); // Render without binding event listener
             return
         } else if (this.round % 2 === 1 && this.round < 9) {
             this.botBrain(uiRendering.difficultyValue);
-            if (this.checkWins(bot)) {
+            if (this.checkWins(this.gameboard, bot)) {
                 console.log('Bot Wins!')
-                uiRendering.renderBoard();
+                uiRendering.renderBoard(); // Render without binding event listener
             };
-        } else if (this.round === 9) {
+        } else if (this.emptyCells(this.gameboard).length === 0) {
             console.log('DRAW!');
-            uiRendering.renderBoard();
+            uiRendering.renderBoard(); // Render without binding event listener
         };
     },
-    checkWins: function(player) {
+    checkWins: function(board, player) {
         // Check Rows
         for (let i = 0; i < 3; i++) {
             if (
-                this.gameboard[i][0] === player.choice &&
-                this.gameboard[i][1] === player.choice &&
-                this.gameboard[i][2] === player.choice
+                board[i][0] === player.choice &&
+                board[i][1] === player.choice &&
+                board[i][2] === player.choice
                 ) {
                 return true;
             }
@@ -36,28 +36,79 @@ const gameLogic = {
         // Check columns
         for (let j = 0; j < 3; j++) {
             if (
-                this.gameboard[0][j] === player.choice &&
-                this.gameboard[1][j] === player.choice &&
-                this.gameboard[2][j] === player.choice
+                board[0][j] === player.choice &&
+                board[1][j] === player.choice &&
+                board[2][j] === player.choice
                 ) {
                 return true;
             }
         }    
         // Check diagonals
-        if (this.gameboard[0][0] === player.choice &&
-            this.gameboard[1][1] === player.choice &&
-            this.gameboard[2][2] === player.choice
+        if (board[0][0] === player.choice &&
+            board[1][1] === player.choice &&
+            board[2][2] === player.choice
             ) {
             return true;
         }
-        if (this.gameboard[0][2] === player.choice &&
-            this.gameboard[1][1] === player.choice &&
-            this.gameboard[2][0] === player.choice
+        if (board[0][2] === player.choice &&
+            board[1][1] === player.choice &&
+            board[2][0] === player.choice
             ) {
             return true;
         }        
     // If no winning condition is met, return false
     return false;
+    },
+    emptyCells: function(board) {
+        const emptyCells = [];
+        for (let i = 0; i < board.length; i++) {
+            for (let j = 0; j < board[i].length; j++) {
+                if (board[i][j] === '') {
+                    emptyCells.push({ row: i, col: j });
+                };
+            };
+        };
+        return emptyCells;
+    },
+    minimax: function(newBoard, depth, currentPlayer) {
+        if (this.checkWins(newBoard, bot.choice)) return {score: 10 - depth};
+        if (this.checkWins(newBoard, player.choice)) return {score: -10 + depth};
+        if (this.emptyCells(newBoard).length === 0) return {score: 0};
+
+        // available moves this iteration can make
+        const availableMoves = this.emptyCells(newBoard);
+        // scoring best bot move
+        if (currentPlayer === bot) {
+            let bestScore = -Infinity; // initializing score
+            let bestMove;
+            for (const move of availableMoves) {
+                newBoard[move.row][move.col] = bot.choice;
+                const {score} = this.minimax(newBoard, depth + 1, player); // recursive
+                newBoard[move.row][move.col] = '';
+
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestMove = move;
+                }
+            }
+            return {move: bestMove, score: bestScore};
+        }
+        // scoring best player move
+        if (currentPlayer === player) {
+            let bestScore = Infinity; // initializing score
+            let bestMove;
+            for (const move of availableMoves) {
+                newBoard[move.row][move.col] = player.choice;
+                const {score} = this.minimax(newBoard, depth + 1, bot); // recursive
+                newBoard[move.row][move.col] = '';
+
+                if (score < bestScore) {
+                    bestScore = score;
+                    bestMove = move;
+                }
+            }
+            return {move: bestMove, score: bestScore};
+        }
     },
     botBrain: function(difficulty) {
         let row;
@@ -66,8 +117,9 @@ const gameLogic = {
             let row = Math.floor(Math.random() * 3);
             let col = Math.floor(Math.random() * 3);
             uiRendering.placeMarker(row, col, bot.choice) ? console.log('Bot moved!'): this.botBrain('easy');
-        } else {
-            
+        } else if (difficulty === 'hard'){
+            const {move} = this.minimax(this.gameboard, 0 , bot);
+            uiRendering.placeMarker(move.row, move.col, bot.choice)
         };
     },
     resetGame: function() {
