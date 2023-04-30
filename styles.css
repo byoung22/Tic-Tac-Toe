@@ -1,20 +1,43 @@
 * {
     box-sizing: border-box;
+    font-family: 'Courier New', Courier, monospace;
+    outline: 1px dotted red;
+    padding: 0;
+    margin: 0;
 }
-
-.row {
+body {
     display: flex;
-    
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5vh;
 }
-
+header {
+    margin-top: 10px;
+    font-size: 100px;
+}
+#container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    border: 3px solid black;
+}
 .cell {
     display: flex;
-
     flex: none;
     width: 200px;
     height: 200px;
-    border: 1px solid black;
+    border: 3px solid black;
     text-align: center;
     vertical-align: middle;
     font-size: 48px;
+}
+.button-container {
+    display: flex;
+    gap: 53px;
+}
+button,
+label,
+select {
+    font-size: 20px;
 }
